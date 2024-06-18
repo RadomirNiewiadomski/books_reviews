@@ -1,51 +1,58 @@
-"""
-Views for the menu API.
-"""
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import viewsets, status
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
-from reviews.models import Book, Review
+import json
 
-from reviews import serializers
+from .models import Book, Review
+from .forms import BookForm, ReviewForm
 
+class BookListView(ListView):
+    model = Book
+    template_name = 'index.html'
+    context_object_name = 'books'
 
-class BookViewSet(viewsets.ModelViewSet):
-    """View for manage book APIs."""
-    serializer_class = serializers.BookDetailSerializer
-    queryset = Book.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+class BookDetailView(DetailView):
+    model = Book
+    template_name = 'book_detail.html'
+    context_object_name = 'book'
 
-    def get_serializer_class(self):
-        """Return serializer class for request."""
-        if self.action == 'list':
-            return serializers.BookSerializer
-        elif self.action == 'upload_image':
-            return serializers.BookImageSerializer
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['reviews'] = Review.objects.filter(book=self.object)
+        context['review_form'] = ReviewForm()
+        return context
 
-        return self.serializer_class
-
-    @action(methods=['POST'], detail=True, url_path='upload-image')
-    def upload_image(self, request, pk=None):
-        """Upload an image to a book."""
-        book = self.get_object()
-        serializer = self.get_serializer(book, data=request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class ReviewViewSet(viewsets.ModelViewSet):
-    """View for manage review APIs"""
-    serializer_class = serializers.ReviewSerializer
-    queryset = Review.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+class AddBookView(LoginRequiredMixin, CreateView):
+    model = Book
+    form_class = BookForm
+    template_name = 'add_book.html'
+    success_url = '/'
 
 
-    
+@login_required
+@csrf_exempt
+def add_review(request, book_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        rating = data.get('rating')
+        content = data.get('content')
+
+        book = Book.objects.get(id=book_id)
+        review = Review.objects.create(
+            book=book,
+            reviewer=request.user,
+            content=content,
+            rating=rating
+        )
+
+        return JsonResponse({
+            'success': True,
+            'reviewer': request.user.username,
+            'rating': review.rating,
+            'content': review.content
+        })
+
+    return JsonResponse({'success': False}, status=400)

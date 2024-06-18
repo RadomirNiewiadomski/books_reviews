@@ -30,12 +30,17 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name='api-schema'),
         name='api-docs',
     ),
-    path('api/user/', include('user.urls')),
-    path('api/reviews/', include('reviews.urls')),
+    path('api/user/', include('user.urls', namespace='user-api')),
+    path('api/reviews/', include('reviews.urls', namespace='reviews-api')),
+    path('', include('reviews.urls')),
+    path('user/', include('user.urls_login', namespace='user-login')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT,
+    ) + static(
+        settings.STATIC_URL,
+        document_root=settings.STATIC_ROOT,
     )

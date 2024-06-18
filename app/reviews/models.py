@@ -42,13 +42,32 @@ class Book(models.Model):
     
     def __str__(self):
         return self.title
+    
+    def update_average_rating(self):
+        """Update the average rating for the book based on reviews."""
+        reviews = self.review_set.all()
+        total_rating = sum(review.rating for review in reviews)
+        self.average_rating = total_rating / reviews.count() if reviews.count() > 0 else 0
+        self.save()
 
 class Review(models.Model):
+    RATING_CHOICES = [
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5'),
+    ]
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
-    rating = models.IntegerField()
+    rating = models.IntegerField(choices=RATING_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
         return f"{self.reviewer.name}'s review of {self.book.title}"
+    
+    def save(self, *args, **kwargs):
+        """Override save method to update book's average rating."""
+        super().save(*args, **kwargs)
+        self.book.update_average_rating()
