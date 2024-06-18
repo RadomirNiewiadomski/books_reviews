@@ -37,7 +37,6 @@ class BookSerializer(serializers.ModelSerializer):
                   'author',
                   'average_rating',
                   'created_at',
-                  'updated_at',
                   'image',
                   ]
         read_only_fields = ['id']
@@ -69,7 +68,6 @@ class BookDetailSerializer(BookSerializer):
                   'description',
                   'average_rating',
                   'created_at',
-                  'updated_at',
                   'image',
                   ]
         read_only_fields = ['id']
