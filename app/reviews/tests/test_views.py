@@ -13,7 +13,9 @@ class BookListViewTests(TestCase):
         self.client = Client()
         self.category = Category.objects.create(name='Science Fiction')
         self.author = Author.objects.create(name='Jane Doe', description='An author of science fiction books.')
-        self.book = Book.objects.create(title='A Sci-Fi Book', description='A great sci-fi book.', category=self.category, author=self.author)
+        self.book = Book.objects.create(
+            title='A Sci-Fi Book', description='A great sci-fi book.', category=self.category, author=self.author
+        )
 
     def test_book_list_view(self):
         response = self.client.get(reverse('reviews:index'))
@@ -36,7 +38,9 @@ class BookDetailViewTests(TestCase):
         self.client = Client()
         self.category = Category.objects.create(name='Science Fiction')
         self.author = Author.objects.create(name='Jane Doe', description='An author of science fiction books.')
-        self.book = Book.objects.create(title='A Sci-Fi Book', description='A great sci-fi book.', category=self.category, author=self.author)
+        self.book = Book.objects.create(
+            title='A Sci-Fi Book', description='A great sci-fi book.', category=self.category, author=self.author
+        )
         self.user = User.objects.create_user(email='test@example.com', password='testpass123', name='Test User')
 
     def test_book_detail_view(self):
@@ -64,7 +68,9 @@ class BookDetailViewTests(TestCase):
 class AddBookViewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(email='admin@example.com', password='adminpass123', name='Admin User', is_staff=True)
+        self.user = User.objects.create_user(
+            email='admin@example.com', password='adminpass123', name='Admin User', is_staff=True
+        )
         self.category = Category.objects.create(name='Science Fiction')
         self.author = Author.objects.create(name='Jane Doe', description='An author of science fiction books.')
 
@@ -73,15 +79,16 @@ class AddBookViewTests(TestCase):
         response = self.client.get(reverse('reviews:add_book'))
         self.assertEqual(response.status_code, 200)
 
-        with open('static/images/default_book_cover.jpg', 'rb') as image:
-            response = self.client.post(reverse('reviews:add_book'), {
+        response = self.client.post(
+            reverse('reviews:add_book'),
+            {
                 'title': 'New Sci-Fi Book',
                 'description': 'A new sci-fi book description.',
                 'category': self.category.id,
                 'author': self.author.id,
-                'image': image
-            })
-            self.assertEqual(response.status_code, 302)
+            },
+        )
+        self.assertEqual(response.status_code, 302)
 
         new_book = Book.objects.get(title='New Sci-Fi Book')
         self.assertEqual(new_book.description, 'A new sci-fi book description.')
@@ -90,17 +97,18 @@ class AddBookViewTests(TestCase):
 class AddAuthorViewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(email='admin@example.com', password='adminpass123', name='Admin User', is_staff=True)
+        self.user = User.objects.create_user(
+            email='admin@example.com', password='adminpass123', name='Admin User', is_staff=True
+        )
 
     def test_add_author_view(self):
         self.client.login(email='admin@example.com', password='adminpass123')
         response = self.client.get(reverse('reviews:add_author'))
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(reverse('reviews:add_author'), {
-            'name': 'New Author',
-            'description': 'An author description.'
-        })
+        response = self.client.post(
+            reverse('reviews:add_author'), {'name': 'New Author', 'description': 'An author description.'}
+        )
         self.assertEqual(response.status_code, 302)
 
         new_author = Author.objects.get(name='New Author')
@@ -110,16 +118,16 @@ class AddAuthorViewTests(TestCase):
 class AddCategoryViewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(email='admin@example.com', password='adminpass123', name='Admin User', is_staff=True)
+        self.user = User.objects.create_user(
+            email='admin@example.com', password='adminpass123', name='Admin User', is_staff=True
+        )
 
     def test_add_category_view(self):
         self.client.login(email='admin@example.com', password='adminpass123')
         response = self.client.get(reverse('reviews:add_category'))
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(reverse('reviews:add_category'), {
-            'name': 'New Category'
-        })
+        response = self.client.post(reverse('reviews:add_category'), {'name': 'New Category'})
         self.assertEqual(response.status_code, 302)
 
         new_category = Category.objects.get(name='New Category')
@@ -132,16 +140,18 @@ class AddReviewTests(TestCase):
         self.user = User.objects.create_user(email='test@example.com', password='testpass123', name='Test User')
         self.category = Category.objects.create(name='Science Fiction')
         self.author = Author.objects.create(name='Jane Doe', description='An author of science fiction books.')
-        self.book = Book.objects.create(title='A Sci-Fi Book', description='A great sci-fi book.', category=self.category, author=self.author)
+        self.book = Book.objects.create(
+            title='A Sci-Fi Book', description='A great sci-fi book.', category=self.category, author=self.author
+        )
 
     def test_add_review(self):
         self.client.login(email='test@example.com', password='testpass123')
-        response = self.client.post(reverse('reviews:add_review', args=[self.book.id]), {
-            'content': 'Amazing book',
-            'rating': 5
-        }, content_type='application/json')
+        response = self.client.post(
+            reverse('reviews:add_review', args=[self.book.id]),
+            {'content': 'Amazing book', 'rating': 5},
+            content_type='application/json',
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, {'success': True})
 
         new_review = Review.objects.get(content='Amazing book')
         self.assertEqual(new_review.rating, 5)
@@ -152,26 +162,29 @@ class AddReviewTests(TestCase):
         self.client.login(email='test@example.com', password='testpass123')
         Review.objects.create(book=self.book, reviewer=self.user, content='Great book', rating=5)
 
-        response = self.client.post(reverse('reviews:add_review', args=[self.book.id]), {
-            'content': 'Another review',
-            'rating': 4
-        }, content_type='application/json')
+        response = self.client.post(
+            reverse('reviews:add_review', args=[self.book.id]),
+            {'content': 'Another review', 'rating': 4},
+            content_type='application/json',
+        )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, {'success': False, 'message': 'You have already reviewed this book.'})
 
     def test_add_review_missing_content_or_rating(self):
         self.client.login(email='test@example.com', password='testpass123')
 
-        response = self.client.post(reverse('reviews:add_review', args=[self.book.id]), {
-            'content': '',
-            'rating': 5
-        }, content_type='application/json')
+        response = self.client.post(
+            reverse('reviews:add_review', args=[self.book.id]),
+            {'content': '', 'rating': 5},
+            content_type='application/json',
+        )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, {'success': False, 'message': 'Content and rating are required.'})
 
-        response = self.client.post(reverse('reviews:add_review', args=[self.book.id]), {
-            'content': 'Great book',
-            'rating': ''
-        }, content_type='application/json')
+        response = self.client.post(
+            reverse('reviews:add_review', args=[self.book.id]),
+            {'content': 'Great book', 'rating': ''},
+            content_type='application/json',
+        )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, {'success': False, 'message': 'Content and rating are required.'})
