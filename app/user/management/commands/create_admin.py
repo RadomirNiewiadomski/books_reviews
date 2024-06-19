@@ -6,11 +6,11 @@ class Command(BaseCommand):
     """Command to create default admin (in DEV mode)."""
     def handle(self, *arg, **options):
         admin_user = get_user_model().objects.filter(
-            email="admin@review.com", is_superuser=True)
+            email="admin@example.com", is_superuser=True)
         if admin_user.exists():
             self.stdout.write(self.style.SUCCESS(
                 'This admin user already exists.'))
         else:
             get_user_model().objects.create_superuser(
-                email="admin@review.com", password="pass1234")
+                email="admin@example.com", password="password123", name='Administrator')
             self.stdout.write(self.style.SUCCESS('Admin user was created.'))

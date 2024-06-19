@@ -31,7 +31,7 @@ urlpatterns = [
         name='api-docs',
     ),
     path('api/user/', include('user.urls', namespace='user-api')),
-    path('api/reviews/', include('reviews.urls', namespace='reviews-api')),
+    path('api/reviews/', include('reviews.urls_api')),
     path('', include('reviews.urls')),
     path('user/', include('user.urls_login', namespace='user-login')),
 ]

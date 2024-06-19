@@ -32,9 +32,9 @@ class Author(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
-    author = models.ManyToManyField(Author)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
     description = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='books')
     average_rating = models.FloatField(default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(null=True, blank=True,
@@ -49,6 +49,9 @@ class Book(models.Model):
         total_rating = sum(review.rating for review in reviews)
         self.average_rating = total_rating / reviews.count() if reviews.count() > 0 else 0
         self.save()
+        
+    def short_description(self):
+        return self.description.split('.')[0] + '...'
 
 class Review(models.Model):
     RATING_CHOICES = [

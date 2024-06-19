@@ -2,9 +2,28 @@
 {% block title %}Add Book{% endblock %}
 {% block content %}
     <h1>Add a New Book</h1>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data" class="add-form">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="form-group">
+            <label for="id_title">Title:</label>
+            {{ form.title }}
+        </div>
+        <div class="form-group">
+            <label for="id_author">Author:</label>
+            {{ form.author }}
+        </div>
+        <div class="form-group">
+            <label for="id_description">Description:</label>
+            {{ form.description }}
+        </div>
+        <div class="form-group">
+            <label for="id_category">Category:</label>
+            {{ form.category }}
+        </div>
+        <div class="form-group">
+            <label for="id_image">Image:</label>
+            {{ form.image }}
+        </div>
         <button type="submit" class="btn btn-primary">Add Book</button>
     </form>
 {% endblock %}

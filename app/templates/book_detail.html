@@ -4,15 +4,15 @@
 {% block content %}
     <h1>{{ book.title }}</h1>
     {% if book.image %}
-        <img src="{{ book.image.url }}" class="card-img-top" alt="{{ book.title }}">
+        <img src="{{ book.image.url }}" class="img-fluid book-image" alt="{{ book.title }}">
     {% else %}
-        <img src="{% static 'images/default_book_cover.jpg' %}" class="card-img-top" alt="Default cover for {{ book.title }}">
+        <img src="{% static 'images/default_book_cover.jpg' %}" class="img-fluid book-image" alt="Default cover for {{ book.title }}">
     {% endif %}
     <p>{{ book.description }}</p>
-    <p><strong>Rating: {{ book.average_rating }}</strong></p>
+    <p><strong>Rating: <span id="average-rating">{{ book.average_rating|floatformat:1 }}</span></strong></p>
     <h2>Reviews</h2>
     <div id="review-list">
-        {% for review in reviews %}
+        {% for review in page_obj %}
             <div class="card mb-2">
                 <div class="card-body">
                     <h5 class="card-title">{{ review.reviewer.name }}</h5>
@@ -22,21 +22,40 @@
             </div>
         {% endfor %}
     </div>
-    <h2>Add a Review</h2>
-    <form id="review-form" onsubmit="event.preventDefault(); submitReview({{ book.id }});">
-        <textarea id="review-content" rows="4" cols="50" placeholder="Write your review here..."></textarea>
-        <div class="star-rating">
-            <input type="radio" id="5-stars" name="rating" value="5" />
-            <label for="5-stars" class="star">&#9733;</label>
-            <input type="radio" id="4-stars" name="rating" value="4" />
-            <label for="4-stars" class="star">&#9733;</label>
-            <input type="radio" id="3-stars" name="rating" value="3" />
-            <label for="3-stars" class="star">&#9733;</label>
-            <input type="radio" id="2-stars" name="rating" value="2" />
-            <label for="2-stars" class="star">&#9733;</label>
-            <input type="radio" id="1-stars" name="rating" value="1" />
-            <label for="1-stars" class="star">&#9733;</label>
-        </div>
-        <button type="submit" class="btn btn-primary">Add Review</button>
-    </form>
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+    {% if user.is_authenticated %}
+        <h2>Add a Review</h2>
+        <form id="review-form" onsubmit="event.preventDefault(); submitReview({{ book.id }});">
+            <textarea id="review-content" rows="4" cols="50" placeholder="Write your review here..."></textarea>
+            <div class="star-rating">
+                <input type="radio" id="5-stars" name="rating" value="5" />
+                <label for="5-stars" class="star">&#9733;</label>
+                <input type="radio" id="4-stars" name="rating" value="4" />
+                <label for="4-stars" class="star">&#9733;</label>
+                <input type="radio" id="3-stars" name="rating" value="3" />
+                <label for="3-stars" class="star">&#9733;</label>
+                <input type="radio" id="2-stars" name="rating" value="2" />
+                <label for="2-stars" class="star">&#9733;</label>
+                <input type="radio" id="1-stars" name="rating" value="1" />
+                <label for="1-stars" class="star">&#9733;</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Review</button>
+        </form>
+    {% else %}
+        <p>You need to <a href="{% url 'user-login:login' %}">log in</a> to add a review.</p>
+    {% endif %}
 {% endblock %}

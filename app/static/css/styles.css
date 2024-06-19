@@ -1,3 +1,20 @@
+.search-form {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.book-image {
+    height: 300px;
+    width: auto;
+}
+
+.card-img-top {
+    max-width: 100%;
+    height: 300px;
+    object-fit: contain;
+    background-color: #ffffff;
+}
+
 .star-rating {
     display: flex;
     direction: row;
@@ -19,4 +36,28 @@
 .star-rating label:hover,
 .star-rating label:hover ~ label {
     color: #ffc107;
+}
+
+.add-book-form .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    max-width: 400px;
+}
+
+.add-form .form-group label {
+    width: 100px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.add-form .form-group input,
+.add-form .form-group select,
+.add-form .form-group textarea {
+    flex: 1;
+}
+
+.add-form button {
+    margin-top: 15px;
 }
