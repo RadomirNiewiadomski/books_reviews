@@ -9,6 +9,8 @@
         <img src="{% static 'images/default_book_cover.jpg' %}" class="img-fluid book-image" alt="Default cover for {{ book.title }}">
     {% endif %}
     <p>{{ book.description }}</p>
+    <p><strong>Author: {{ book.author.name }}</strong></p>
+    <p>About an author: {{ book.author.description }}</p>
     <p><strong>Rating: <span id="average-rating">{{ book.average_rating|floatformat:1 }}</span></strong></p>
     <h2>Reviews</h2>
     <div id="review-list">
