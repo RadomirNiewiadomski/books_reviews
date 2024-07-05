@@ -1,5 +1,5 @@
 """
-Views for the menu API.
+Views for the reviews API.
 """
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -7,13 +7,13 @@ from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from reviews.models import Book, Review
-
 from reviews import serializers
+from reviews.models import Book, Review
 
 
 class BookViewSet(viewsets.ModelViewSet):
     """View for manage book APIs."""
+
     serializer_class = serializers.BookDetailSerializer
     queryset = Book.objects.all()
     authentication_classes = [TokenAuthentication]
@@ -40,12 +40,11 @@ class BookViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ReviewViewSet(viewsets.ModelViewSet):
     """View for manage review APIs"""
+
     serializer_class = serializers.ReviewSerializer
     queryset = Review.objects.all()
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
-
-
-    

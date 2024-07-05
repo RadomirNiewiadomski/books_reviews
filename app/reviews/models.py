@@ -1,11 +1,12 @@
 """
-Database models.
+Database models for reviews.
 """
 import uuid
 import os
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
 from user.models import User
 
 
@@ -23,12 +24,14 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Author(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
 
     def __str__(self):
         return self.name
+
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
@@ -37,21 +40,21 @@ class Book(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='books')
     average_rating = models.FloatField(default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(null=True, blank=True,
-                              upload_to=book_image_file_path)
-    
+    image = models.ImageField(null=True, blank=True, upload_to=book_image_file_path)
+
     def __str__(self):
         return self.title
-    
+
     def update_average_rating(self):
         """Update the average rating for the book based on reviews."""
         reviews = self.review_set.all()
         total_rating = sum(review.rating for review in reviews)
         self.average_rating = total_rating / reviews.count() if reviews.count() > 0 else 0
         self.save()
-        
+
     def short_description(self):
         return self.description.split('.')[0] + '...'
+
 
 class Review(models.Model):
     RATING_CHOICES = [
@@ -66,10 +69,10 @@ class Review(models.Model):
     content = models.TextField()
     rating = models.IntegerField(choices=RATING_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return f"{self.reviewer.name}'s review of {self.book.title}"
-    
+
     def save(self, *args, **kwargs):
         """Override save method to update book's average rating."""
         super().save(*args, **kwargs)

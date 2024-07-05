@@ -2,6 +2,7 @@
 URL mappings for the reviews app.
 """
 from django.urls import path
+
 from .views import BookListView, BookDetailView, AddBookView, AddAuthorView, AddCategoryView, add_review
 
 app_name = 'reviews'

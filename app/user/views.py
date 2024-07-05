@@ -3,11 +3,12 @@ Views for the user API.
 """
 from rest_framework import generics, authentication, permissions
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 from rest_framework.settings import api_settings
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.http import HttpResponse
-from rest_framework.authtoken.models import Token
 
 from user.serializers import UserSerializer, AuthTokenSerializer
 from .forms import CustomAuthenticationForm

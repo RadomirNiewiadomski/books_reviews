@@ -1,6 +1,11 @@
+"""
+URL mappings for the user login.
+"""
+
 from django.urls import path
-from .views import login_view
 from django.contrib.auth.views import LogoutView
+
+from .views import login_view
 
 app_name = 'user-login'
 

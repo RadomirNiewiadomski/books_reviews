@@ -2,25 +2,22 @@
 Tests for models.
 """
 from unittest.mock import patch
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from reviews.models import (
-    Category,
-    Author,
-    Book,
-    Review,
-    book_image_file_path,
-)
+
+from reviews.models import Category, Author, Book, Review, book_image_file_path
+from reviews.tests.utils_for_tests import sample_category, sample_author, sample_book
 
 
 class ModelTest(TestCase):
     """Test models."""
 
     def setUp(self):
-        self.category = Category.objects.create(name='Biography')
-        self.author = Author.objects.create(name='John West', description='An author of many books.')
-        self.book = Book.objects.create(
-            title='Some title', description='Book about teenagers life', category=self.category, author=self.author
+        self.category = sample_category(name='Biography')
+        self.author = sample_author(name='John West')
+        self.book = sample_book(
+            title='Some title', category=self.category, author=self.author
         )
         self.user1 = get_user_model().objects.create_user(
             email='test@example.com', password='testpass123', name='Mark Don'

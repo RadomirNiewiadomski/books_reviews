@@ -1,16 +1,15 @@
+"""
+Views for reviews.
+"""
+import json
+
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.db.models import Avg
-
-import json
 
 from .models import Book, Review, Author, Category
 from .forms import BookForm, ReviewForm, AuthorForm, CategoryForm
@@ -50,7 +49,7 @@ class BookDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        reviews = Review.objects.filter(book=self.object)
+        reviews = Review.objects.filter(book=self.object).order_by('-created_at')
         paginator = Paginator(reviews, 3)
 
         page_number = self.request.GET.get('page')
@@ -82,7 +81,6 @@ class AddCategoryView(LoginRequiredMixin, CreateView):
     success_url = '/'
 
 
-@csrf_exempt
 @login_required
 def add_review(request, book_id):
     if request.method == "POST":
@@ -92,7 +90,7 @@ def add_review(request, book_id):
 
         if content and rating:
             book = get_object_or_404(Book, pk=book_id)
-             # Check if the user has already reviewed this book
+            # Check if the user has already reviewed this book
             existing_review = Review.objects.filter(book=book, reviewer=request.user).first()
             if existing_review:
                 return JsonResponse({"success": False, "message": "You have already reviewed this book."})

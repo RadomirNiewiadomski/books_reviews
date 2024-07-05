@@ -1,4 +1,8 @@
+"""
+Forms for reviews.
+"""
 from django import forms
+
 from .models import Book, Review, Author, Category
 
 
@@ -10,7 +14,7 @@ class BookForm(forms.ModelForm):
             'author': forms.Select(),
             'category': forms.Select(),
         }
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['author'].empty_label = '---------'

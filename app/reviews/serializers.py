@@ -3,12 +3,7 @@ Serializers for menu API.
 """
 from rest_framework import serializers
 
-from reviews.models import (
-    Category,
-    Author,
-    Book,
-    Review
-)
+from reviews.models import Category, Author, Book, Review
 
 
 class CategorySerializer(serializers.ModelSerializer):

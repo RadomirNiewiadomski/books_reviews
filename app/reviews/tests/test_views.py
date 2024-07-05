@@ -1,8 +1,12 @@
+"""
+Tests for views.
+"""
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 from reviews.models import Book, Review, Author, Category
+from reviews.tests.utils_for_tests import sample_category, sample_author, sample_book
 
 
 User = get_user_model()
@@ -11,10 +15,10 @@ User = get_user_model()
 class BookListViewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.category = Category.objects.create(name='Science Fiction')
-        self.author = Author.objects.create(name='Jane Doe', description='An author of science fiction books.')
-        self.book = Book.objects.create(
-            title='A Sci-Fi Book', description='A great sci-fi book.', category=self.category, author=self.author
+        self.category = sample_category(name='Science Fiction')
+        self.author = sample_author(name='Jane Doe')
+        self.book = sample_book(
+            title='A Sci-Fi Book', category=self.category, author=self.author
         )
 
     def test_book_list_view(self):
@@ -36,10 +40,10 @@ class BookListViewTests(TestCase):
 class BookDetailViewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.category = Category.objects.create(name='Science Fiction')
-        self.author = Author.objects.create(name='Jane Doe', description='An author of science fiction books.')
-        self.book = Book.objects.create(
-            title='A Sci-Fi Book', description='A great sci-fi book.', category=self.category, author=self.author
+        self.category = sample_category(name='Science Fiction')
+        self.author = sample_author(name='Jane Doe')
+        self.book = sample_book(
+            title='A Sci-Fi Book', category=self.category, author=self.author
         )
         self.user = User.objects.create_user(email='test@example.com', password='testpass123', name='Test User')
 
@@ -59,10 +63,11 @@ class BookDetailViewTests(TestCase):
             Review.objects.create(book=self.book, reviewer=self.user, content=f'Review {i}', rating=5)
         response = self.client.get(reverse('reviews:book_detail', args=[self.book.id]))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Review 0')
-        self.assertContains(response, 'Review 1')
+        self.assertContains(response, 'Review 4')
+        self.assertContains(response, 'Review 3')
         self.assertContains(response, 'Review 2')
-        self.assertNotContains(response, 'Review 3')
+        self.assertNotContains(response, 'Review 1')
+        self.assertNotContains(response, 'Review 0')
 
 
 class AddBookViewTests(TestCase):
@@ -71,8 +76,8 @@ class AddBookViewTests(TestCase):
         self.user = User.objects.create_user(
             email='admin@example.com', password='adminpass123', name='Admin User', is_staff=True
         )
-        self.category = Category.objects.create(name='Science Fiction')
-        self.author = Author.objects.create(name='Jane Doe', description='An author of science fiction books.')
+        self.category = sample_category(name='Science Fiction')
+        self.author = sample_author(name='Jane Doe')
 
     def test_add_book_view(self):
         self.client.login(email='admin@example.com', password='adminpass123')
@@ -137,11 +142,13 @@ class AddCategoryViewTests(TestCase):
 class AddReviewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(email='test@example.com', password='testpass123', name='Test User')
-        self.category = Category.objects.create(name='Science Fiction')
-        self.author = Author.objects.create(name='Jane Doe', description='An author of science fiction books.')
-        self.book = Book.objects.create(
-            title='A Sci-Fi Book', description='A great sci-fi book.', category=self.category, author=self.author
+        self.user = User.objects.create_user(
+            email='test@example.com', password='testpass123', name='Test User'
+        )
+        self.category = sample_category(name='Science Fiction')
+        self.author = sample_author(name='Jane Doe')
+        self.book = sample_book(
+            title='A Sci-Fi Book', category=self.category, author=self.author
         )
 
     def test_add_review(self):

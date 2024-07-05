@@ -1,3 +1,6 @@
+"""
+Forms for user.
+"""
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 

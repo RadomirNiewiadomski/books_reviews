@@ -1,11 +1,17 @@
+"""
+Tests for reviews API.
+"""
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+
 from rest_framework import status
 from rest_framework.test import APIClient
+
 from reviews.models import Review
 from reviews.serializers import ReviewSerializer
 from reviews.tests.utils_for_tests import sample_category, sample_author, sample_book
+
 
 REVIEWS_URL = reverse('reviews-api:review-list')
 
@@ -15,10 +21,7 @@ class PublicReviewApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = get_user_model().objects.create_user(email='test@example.com', password='testpass123')
 
     def test_retrieve_reviews(self):
         """Test retrieving a list of reviews."""
@@ -49,10 +52,7 @@ class PrivateReviewApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = get_user_model().objects.create_user(email='test@example.com', password='testpass123')
         self.client.force_authenticate(self.user)
         self.category = sample_category()
         self.author = sample_author()
@@ -60,12 +60,7 @@ class PrivateReviewApiTests(TestCase):
 
     def test_create_review(self):
         """Test creating a review."""
-        payload = {
-            'book': self.book.id,
-            'reviewer': self.user.id,
-            'content': 'Amazing book',
-            'rating': 5
-        }
+        payload = {'book': self.book.id, 'reviewer': self.user.id, 'content': 'Amazing book', 'rating': 5}
         res = self.client.post(REVIEWS_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)

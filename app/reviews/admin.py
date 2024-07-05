@@ -3,12 +3,7 @@ Django admin customization.
 """
 from django.contrib import admin
 
-from reviews.models import (
-    Category,
-    Author,
-    Book,
-    Review
-)
+from reviews.models import Category, Author, Book, Review
 
 
 admin.site.register(Category)
